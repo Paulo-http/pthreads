@@ -1,6 +1,12 @@
 # pthreads
 Using pthreads in language C 
 
+## How compile and use:
+The all folder has a makefile to compile the code base. </br>
+Use the command **make -f Makefile** in the folder to compile. </br>
+Use the command **make clean** in the folder to clean the compilation. </br>
+Use the command **open run** in the folder to run the compilation. </br>
+
 ## (Problema do Emparelhamento de Casais)
 Em uma festa, as pessoas que chegam vão sendo agrupadas em casais. Quando um homem chega, ele espera até haver uma mulher para formar par com ele, e quando uma mulher chega, ela espera até haver um homem para formar par com ela. Existem vários homens e várias mulheres, eles ficam bloqueados até serem emparelhadas. Após formarem um par elas saem para dançar.
 As pessoas não podem escolher o par, porém um par deve ter sempre exatamente um homem e uma mulher.
