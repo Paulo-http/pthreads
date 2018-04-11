@@ -8,8 +8,6 @@
 
 #include "queue.h"
 
-int size;
-
 bool is_empty(node *people) {
     return (people->next == NULL) ? true : false;
 }
@@ -31,7 +29,6 @@ void _free(node *people) {
 
 void start(node *people) {
     people->next = NULL;
-    size = 0;
 }
 
 node *alloc(enum gender type) {
@@ -54,8 +51,6 @@ void append(node *people, enum gender type) {
         
         next_person->next = person;
     }
-    
-    size++;
 }
 
 void _remove(node *people) {
@@ -64,7 +59,6 @@ void _remove(node *people) {
     } else {
         node *next_person = people->next;
         people->next = next_person->next;
-        size--;
         if(next_person != NULL) {
             free(next_person);
         }

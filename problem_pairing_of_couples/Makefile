@@ -17,3 +17,4 @@ $(EXEC): $(OBJ)
 
 clean:
 	rm -rf $(OBJ)
+	rm -rf $(EXEC)
