@@ -8,7 +8,7 @@
 
 #include "problem.h"
 
-#define FULL_BOTTLE 1000
+#define TOTAL_ELEMENTS 1000
 pthread_mutex_t mutex;
 pthread_t thr1, thr2;
 
@@ -16,22 +16,38 @@ countable c;
 arguments args;
 bool error = false;
 
-void *generate_element(void *args) {
+void *generate_oxygens(void *args) {
     arguments *_args = args;
     node *oxygens = _args->oxygens;
     node *hydrogens = _args->hydrogens;
     
-    while (++c.elements < FULL_BOTTLE) {
+    while (true) {
         pthread_mutex_lock(&mutex);
-        bool is_oxygen = rand() & 1;
-        if (is_oxygen) {
+        
+        if (!is_empty(oxygens) && count(hydrogens) > 1) {
+            _remove(oxygens);
+            _remove(hydrogens);
+            _remove(hydrogens);
+            printf("-- new water element\n");
+            printf("-- water elements: %d\n\n", ++c.h2o);
+        } else if (++c.elements < TOTAL_ELEMENTS) {
             append(oxygens, oxygen);
             printf("- new element: oxygen\n");
         } else {
-            append(hydrogens, hydrogen);
-            printf("- new element: hydrogen\n");
+            --c.elements;
+            printf("---- elements created ----\n\n");
+            printf("- elements: %d\n", c.elements);
+            printf("-- water elements: %d\n", c.h2o);
+            int total_oxygens = count(oxygens);
+            printf("oxygens not utilized: %d\n", total_oxygens);
+            int total_hydrogens = count(hydrogens);
+            printf("hydrogens not utilized: %d\n\n", total_hydrogens);
+            pthread_mutex_unlock(&mutex);
+            break;
         }
+        
         printf("- elements: %d\n\n", c.elements);
+        
         pthread_mutex_unlock(&mutex);
     }
     
@@ -39,29 +55,23 @@ void *generate_element(void *args) {
     return NULL;
 }
 
-void *merge_elements(void *args) {
+void *generate_hydrogens(void *args) {
     arguments *_args = args;
-    node *oxygens = _args->oxygens;
     node *hydrogens = _args->hydrogens;
-
+    
     while (true) {
         pthread_mutex_lock(&mutex);
-        if (!is_empty(oxygens) && count(hydrogens) > 1) {
-            _remove(oxygens);
-            _remove(hydrogens);
-            _remove(hydrogens);
-            printf("-- new H2O created\n");
-            printf("-- H2O: %d\n\n", ++c.h2o);
-        } else if (c.elements == FULL_BOTTLE) {
-            printf("---- full bottle ----\n\n");
-            printf("- elements: %d\n", c.elements);
-            printf("-- H2O: %d\n", c.h2o);
-            int total_oxygens = count(oxygens);
-            printf("oxygens not utilized: %d\n", total_oxygens);
-            int total_hydrogens = count(hydrogens);
-            printf("hydrogens not utilized: %d\n\n", total_hydrogens);
+        
+        if (++c.elements < TOTAL_ELEMENTS) {
+            append(hydrogens, hydrogen);
+            printf("- new element: hydrogen\n");
+        } else {
+            pthread_mutex_unlock(&mutex);
             break;
         }
+        
+        printf("- elements: %d\n\n", c.elements);
+        
         pthread_mutex_unlock(&mutex);
     }
     
@@ -94,12 +104,12 @@ void problem_production_of_water() {
         exit(1);
     }
 
-    error = pthread_create(&thr1, NULL, &generate_element, (void*) &args);
+    error = pthread_create(&thr1, NULL, &generate_oxygens, (void*) &args);
     if (error) {
         exit(1);
     }
 
-    error = pthread_create(&thr2, NULL, &merge_elements, (void*) &args);
+    error = pthread_create(&thr2, NULL, &generate_hydrogens, (void*) &args);
     if (error) {
         exit(1);
     }
